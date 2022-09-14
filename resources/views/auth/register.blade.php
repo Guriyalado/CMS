@@ -11,6 +11,7 @@
 				   <h2 class="fw-bold text-secondary">Register</h2>
 			    </div>
 			    <div class="card-body p-5">
+			    	<div id="show_success_alert">
 			    	<form action="#" method="POST" id="register_form">
 			    		@csrf
 			    		<div class="mb-3">
@@ -42,6 +43,7 @@
 
 			    	</form>
 			    </div>
+			    </div>
 		    </div>
 	    </div>
    <!--  </div> -->
@@ -56,14 +58,26 @@
 $(function(){
 	$("#register_form").submit(function(e){
 	e.preventDefault();
-	$("#register_btn").val('please wait....');
+	$("#register_btn").val('Register');
 	$.ajax({
 		url:'{{route('auth.register')}}',
 		method:'post',
 		data:$(this).serialize(),
 		dataType:'json',
 		success:function(res){
-			console.log(res);
+			if(res.status==400){
+				showError('name',res.messages.name);
+				showError('email',res.messages.email);
+				showError('password',res.messages.password);
+				showError('cpassword',res.messages.cpassword);
+				$("#register_btn").val('Register');
+
+			}else if(res.status==200){
+				$("#show_success_alert").html(showMessage('success',res.messages));
+				$("#register_form")[0].reset();
+				removeValidationClass("#register_form");
+				$("#register_btn").val('Register');
+			}
 		}
 
       });
